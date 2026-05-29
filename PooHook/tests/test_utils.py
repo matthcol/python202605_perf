@@ -13,5 +13,5 @@ def test_skip_over_the_limit():
     assert isinstance(it, Iterator)
     assert list(it) == []
 
-def test_dummy():
-    pass
+def test_dummy(dummy_fixture):
+    assert dummy_fixture == 'dummy'

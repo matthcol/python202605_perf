@@ -26,24 +26,32 @@ class Polygon(Sized, Iterable):
 
     # Tutorial Pattern matching
     # https://peps.python.org/pep-0636/
-    def __add__(self, other) -> Polygon:
-        # TODO : add coord, tuple(coord)
-        if not isinstance(other, int):
-            return NotImplemented
-        return Polygon(
-            [(x + other, y + other) for (x,y) in self.vertices]
-        )
+    def __add__(self, other) -> 'Polygon': # with python 3.14+, quotes around current class for typing are not mandatory anymore
+        match other:
+            case int() | float():
+                return Polygon([(x + other, y + other) for (x,y) in self.vertices])
+            # case (int(dx) | float(dx), int(dy) | float(dy)):
+            case (int() | float() as dx, int() | float() as dy):
+                return Polygon([(x + dx, y + dy) for (x, y) in self.vertices])
+            case _: 
+                return NotImplemented
+        
     
-    def __radd__(self, other) -> Polygon:
+    def __radd__(self, other) -> 'Polygon':
         return self.__add__(other)
     
-    def __iadd__(self, other) -> Polygon:
-        if not isinstance(other, int):
-            return NotImplemented
-        for i, (x, y) in enumerate(self.vertices):
-            self.vertices[i] = (x + other, y + other) 
+    # Note: if absent calls __add__ and replace reference
+    def __iadd__(self, other) -> 'Polygon':
+        match other:
+            case int() | float():
+                for i, (x, y) in enumerate(self.vertices):
+                    self.vertices[i] = (x + other, y + other) 
+            case (int() | float() as dx, int() | float() as dy):
+                for i, (x, y) in enumerate(self.vertices):
+                    self.vertices[i] = (x + dx, y + dy) 
+            case _: 
+                return NotImplemented
         return self
-
 
     # 2nd iteration => .edges()
     def edges(self) -> Generator[segment, None, None]:
